@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kenia Resto</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #ffffff; color: #333; font-family: Arial; padding: 20px; min-height: 100vh; }
+    h1 { color: #d4891e; font-size: 24px; margin-bottom: 5px; text-align: center; }
+    h2 { color: #e67e22; font-size: 17px; margin: 20px 0 10px; }
+    p { color: #555; font-size: 14px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
+    .tab { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; }
+    .tab.actif { background: #d4891e; color: white; }
+    .tab.inactif { background: #f0e6d3; color: #666; }
+    .plat-card { background: #f9f4ed; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #d4891e; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .plat-nom { font-size: 14px; font-weight: bold; color: #d4891e; }
+    .plat-desc { font-size: 12px; color: #666; margin-top: 3px; }
+    .plat-prix { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 8px; text-align: right; }
+    .btn-ajouter { padding: 6px 14px; border-radius: 8px; background: #d4891e; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 13px; }
+    .categorie-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-top: 4px; background: #d4891e22; color: #d4891e; border: 1px solid #d4891e44; }
+    .panier-item { background: #f9f4ed; border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .panier-nom { font-size: 13px; color: #333; }
+    .panier-prix { font-size: 13px; color: #e67e22; font-weight: bold; }
+    .qty-controls { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+    .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #d4891e; color: white; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .qty-val { font-size: 14px; font-weight: bold; color: #d4891e; min-width: 20px; text-align: center; }
+    .total-box { background: #f9f4ed; border-radius: 12px; padding: 15px; margin-top: 15px; border: 2px solid #d4891e; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .btn-commander { width: 100%; padding: 14px; background: linear-gradient(135deg, #d4891e, #e67e22); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .btn-commander.desactive { background: #ccc; cursor: not-allowed; opacity: 0.7; }
+    .form-field { margin-bottom: 12px; }
+    .form-label { font-size: 12px; color: #555; margin-bottom: 5px; display: block; }
+    .form-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f9f4ed; color: #333; font-size: 14px; }
+    .form-input:focus { outline: none; border-color: #d4891e; }
+    .btn-reserver { width: 100%; padding: 12px; background: #d4891e; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
+    .notif { position: fixed; top: 20px; right: 20px; background: #f9f4ed; border-left: 4px solid #d4891e; border-radius: 10px; padding: 12px 16px; font-size: 13px; z-index: 999; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #333; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+    .panier-badge { background: #e74c3c; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; }
+    .empty-state { text-align: center; padding: 40px; color: #999; }
+    .empty-state .emoji { font-size: 48px; }
+    .empty-state p { margin-top: 10px; color: #999; }
+    .paiement-options { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+    .paiement-option { flex: 1; min-width: 100px; padding: 12px; border-radius: 10px; border: 2px solid #ddd; background: white; cursor: pointer; text-align: center; font-weight: bold; font-size: 13px; transition: all 0.2s; }
+    .paiement-option:hover { border-color: #d4891e; }
+    .paiement-option.selectionne { border-color: #d4891e; background: #d4891e10; }
+    .paiement-option .icon { font-size: 24px; display: block; margin-bottom: 5px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background: white; border-radius: 16px; padding: 30px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+    .modal h3 { color: #d4891e; margin-bottom: 15px; }
+    .modal .btn-fermer { margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none; background: #d4891e; color: white; font-weight: bold; cursor: pointer; width: 100%; }
+    .btn-payer { width: 100%; padding: 14px; background: linear-gradient(135deg, #27ae60, #2ecc71); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .section-titre { font-size: 14px; font-weight: bold; color: #d4891e; margin: 15px 0 10px; padding-bottom: 5px; border-bottom: 2px solid #d4891e22; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+<script type="text/babel">
+
+  const MENU = [
+    { id:1, nom:"Thiéboudienne", desc:"Riz au poisson sénégalais", prix:4500, categorie:"Plat principal", emoji:"🐟" },
+    { id:2, nom:"Poulet Yassa", desc:"Poulet mariné aux oignons et citron", prix:3500, categorie:"Plat principal", emoji:"🍗" },
+    { id:3, nom:"Attiéké Poisson", desc:"Semoule de manioc avec poisson grillé", prix:3000, categorie:"Plat principal", emoji:"🍽️" },
+    { id:4, nom:"Salade Africaine", desc:"Légumes frais avec sauce arachide", prix:1500, categorie:"Entrée", emoji:"🥗" },
+    { id:5, nom:"Soupe Kandja", desc:"Soupe de gombo traditionnelle", prix:2000, categorie:"Entrée", emoji:"🍲" },
+    { id:6, nom:"Jus de Bissap", desc:"Jus de fleurs d'hibiscus frais", prix:800, categorie:"Boisson", emoji:"🥤" },
+    { id:7, nom:"Jus de Gingembre", desc:"Gingembre frais pressé", prix:700, categorie:"Boisson", emoji:"🍹" },
+    { id:8, nom:"Banana Flambée", desc:"Bananes caramélisées au sucre de canne", prix:1200, categorie:"Dessert", emoji:"🍌" },
+  ];
+
+  const MOYENS_PAIEMENT = [
+    { id: "mobile_money", nom: "Mobile Money", icon: "📱" },
+    { id: "carte", nom: "Carte Bancaire", icon: "💳" },
+    { id: "especes", nom: "Espèces", icon: "💰" },
+  ];
+
+  function App() {
+    const [onglet, setOnglet] = React.useState("menu");
+    const [panier, setPanier] = React.useState([]);
+    const [notif, setNotif] = React.useState(null);
+    const [commande, setCommande] = React.useState(null);
+    const [reservation, setReservation] = React.useState({ nom:"", date:"", heure:"", personnes:"2" });
+    const [reservationFaite, setReservationFaite] = React.useState(false);
+    const [categorie, setCategorie] = React.useState("Tous");
+    const [moyenPaiement, setMoyenPaiement] = React.useState(null);
+    const [modalPaiement, setModalPaiement] = React.useState(false);
+
+    function afficherNotif(msg) {
+      setNotif(msg);
+      setTimeout(() => setNotif(null), 2500);
+    }
+
+    function ajouterAuPanier(plat) {
+      setPanier(prev => {
+        const existe = prev.find(p => p.id === plat.id);
+        if (existe) return prev.map(p => p.id === plat.id ? {...p, qty: p.qty + 1} : p);
+        return [...prev, {...plat, qty: 1}];
+      });
+      afficherNotif("✅ " + plat.emoji + " " + plat.nom + " ajouté !");
+    }
+
+    function changerQty(id, delta) {
+      setPanier(prev => {
+        const updated = prev.map(p => p.id === id ? {...p, qty: p.qty + delta} : p);
+        return updated.filter(p => p.qty > 0);
+      });
+    }
+
+    function passerCommande() {
+      if (panier.length === 0) return;
+      if (!moyenPaiement) {
+        afficherNotif("⚠️ Veuillez choisir un moyen de paiement");
+        return;
+      }
+      setModalPaiement(true);
+    }
+
+    function confirmerPaiement() {
+      setModalPaiement(false);
+      setCommande({ 
+        items: [...panier], 
+        total, 
+        heure: new Date().toLocaleTimeString(),
+        moyen: MOYENS_PAIEMENT.find(m => m.id === moyenPaiement)?.nom || moyenPaiement
+      });
+      setPanier([]);
+      setMoyenPaiement(null);
+      afficherNotif("🎉 Paiement effectué ! Commande confirmée !");
+    }
+
+    function faireReservation() {
+      if (!reservation.nom || !reservation.date || !reservation.heure) return;
+      setReservationFaite(true);
+      afficherNotif("✅ Réservation confirmée !");
+    }
+
+    const categories = ["Tous", ...new Set(MENU.map(p => p.categorie))];
+    const menuFiltre = categorie === "Tous" ? MENU : MENU.filter(p => p.categorie === categorie);
+    const total = panier.reduce((acc, p) => acc + p.prix * p.qty, 0);
+    const nbArticles = panier.reduce((acc, p) => acc + p.qty, 0);
+
+    return (
+      <>
+        {notif && <div className="notif">{notif}</div>}
+
+        {modalPaiement && (
+          <div className="modal-overlay" onClick={() => setModalPaiement(false)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <h3>💳 Confirmer le paiement</h3>
+              <p style={{marginBottom:15, color:"#555"}}>
+                Total : <strong style={{color:"#d4891e"}}>{total.toLocaleString()} F CFA</strong>
+              </p>
+              <p style={{marginBottom:10, color:"#555", fontSize:13}}>
+                Moyen de paiement : <strong>{MOYENS_PAIEMENT.find(m => m.id === moyenPaiement)?.nom}</strong>
+              </p>
+              <div style={{display:"flex", gap:10, marginTop:15}}>
+                <button className="btn-payer" onClick={confirmerPaiement} style={{flex:1}}>
+                  ✅ Payer {total.toLocaleString()} F
+                </button>
+                <button className="btn-fermer" onClick={() => setModalPaiement(false)} style={{flex:0.5, background:"#e74c3c"}}>
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <h1>🍽️ Kenia Resto</h1>
+        <p style={{textAlign:"center", color:"#555", marginBottom:15}}>Restaurant traditionnel africain</p>
+
+        <div className="tabs">
+          <button className={"tab " + (onglet === "menu" ? "actif" : "inactif")} onClick={() => setOnglet("menu")}>🍽️ Menu</button>
+          <button className={"tab " + (onglet === "panier" ? "actif" : "inactif")} onClick={() => setOnglet("panier")}>
+            🛒 Panier {nbArticles > 0 && <span className="panier-badge">{nbArticles}</span>}
+          </button>
+          <button className={"tab " + (onglet === "reservation" ? "actif" : "inactif")} onClick={() => setOnglet("reservation")}>📅 Réserver</button>
+        </div>
+
+        {onglet === "menu" && (
+          <div>
+            <div style={{display:"flex", gap:6, flexWrap:"wrap", marginBottom:12}}>
+              {categories.map(c => (
+                <button key={c} onClick={() => setCategorie(c)} style={{
+                  padding:"5px 12px", borderRadius:20, border:"none", cursor:"pointer", fontSize:12, fontWeight:"bold",
+                  background: categorie === c ? "#d4891e" : "#f0e6d3",
+                  color: categorie === c ? "white" : "#666"
+                }}>{c}</button>
+              ))}
+            </div>
+            {menuFiltre.map(plat => (
+              <div key={plat.id} className="plat-card">
+                <div style={{flex:1}}>
+                  <div className="plat-nom">{plat.emoji} {plat.nom}</div>
+                  <div className="plat-desc">{plat.desc}</div>
+                  <span className="categorie-badge">{plat.categorie}</span>
+                </div>
+                <div style={{textAlign:"right", marginLeft:10}}>
+                  <div className="plat-prix">{plat.prix.toLocaleString()} F</div>
+                  <button className="btn-ajouter" onClick={() => ajouterAuPanier(plat)}>+ Ajouter</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {onglet === "panier" && (
+          <div>
+            {panier.length === 0 && !commande && (
+              <div className="empty-state">
+                <div className="emoji">🛒</div>
+                <p>Ton panier est vide !</p>
+                <button className="tab actif" style={{marginTop:15, padding:"10px 20px"}} onClick={() => setOnglet("menu")}>
+                  Voir le menu
+                </button>
+              </div>
+            )}
+            {panier.map(item => (
+              <div key={item.id} className="panier-item">
+                <div style={{flex:1}}>
+                  <div className="panier-nom">{item.emoji} {item.nom}</div>
+                  <div className="qty-controls">
+                    <button className="qty-btn" onClick={() => changerQty(item.id, -1)}>−</button>
+                    <span className="qty-val">{item.qty}</span>
+                    <button className="qty-btn" onClick={() => changerQty(item.id, 1)}>+</button>
+                  </div>
+                </div>
+                <div className="panier-prix">{(item.prix * item.qty).toLocaleString()} F</div>
+              </div>
+            ))}
+            {panier.length > 0 && (
+              <div className="total-box">
+                <div style={{display:"flex", justifyContent:"space-between", marginBottom:5}}>
+                  <span style={{color:"#555"}}>Total</span>
+                  <span style={{color:"#d4891e", fontWeight:"bold"}}>{total.toLocaleString()} F CFA</span>
+                </div>
+
+                <div className="section-titre">💳 Moyen de paiement</div>
+                <div className="paiement-options">
+                  {MOYENS_PAIEMENT.map(m => (
+                    <div 
+                      key={m.id}
+                      className={"paiement-option" + (moyenPaiement === m.id ? " selectionne" : "")}
+                      onClick={() => setMoyenPaiement(m.id)}
+                    >
+                      <span className="icon">{m.icon}</span>
+                      {m.nom}
+                    </div>
+                  ))}
+                </div>
+
+                <button 
+                  className={"btn-commander" + (moyenPaiement ? "" : " desactive")} 
+                  onClick={passerCommande}
+                >
+                  {moyenPaiement ? "🍽️ Commander — " + total.toLocaleString() + " F CFA" : "⚠️ Sélectionnez un moyen de paiement"}
+                </button>
+              </div>
+            )}
+            {commande && (
+              <div style={{background:"#e8f5e9", borderRadius:12, padding:15, marginTop:15, border:"2px solid #4caf50"}}>
+                <p style={{color:"#2e7d32", fontWeight:"bold", marginBottom:5}}>✅ Commande confirmée ! — {commande.heure}</p>
+                <p style={{color:"#555", fontSize:13, marginBottom:10}}>
+                  💳 Paiement : {commande.moyen}
+                </p>
+                {commande.items.map(item => (
+                  <div key={item.id} style={{display:"flex", justifyContent:"space-between", fontSize:13, padding:"4px 0", borderBottom:"1px solid #c8e6c9"}}>
+                    <span style={{color:"#333"}}>{item.emoji} {item.nom} x{item.qty}</span>
+                    <span style={{color:"#e67e22"}}>{(item.prix * item.qty).toLocaleString()} F</span>
+                  </div>
+                ))}
+                <div style={{display:"flex", justifyContent:"space-between", marginTop:10, paddingTop:10, borderTop:"2px solid #4caf50", fontWeight:"bold", color:"#2e7d32"}}>
+                  <span>Total payé</span>
+                  <span>{commande.total.toLocaleString()} F CFA</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {onglet === "reservation" && (
+          <div>
+            {reservationFaite ? (
+              <div style={{background:"#e8f5e9", borderRadius:12, padding:20, textAlign:"center", border:"2px solid #4caf50"}}>
+                <div style={{fontSize:48, marginBottom:10}}>✅</div>
+                <p style={{color:"#2e7d32", fontWeight:"bold", fontSize:16}}>Réservation confirmée !</p>
+                <p style={{color:"#555", marginTop:8}}>👤 {reservation.nom}</p>
+                <p style={{color:"#555"}}>📅 {reservation.date} à {reservation.heure}</p>
+                <p style={{color:"#555"}}>👥 {reservation.personnes} personnes</p>
+                <button className="btn-reserver" style={{marginTop:15}} onClick={() => { setReservationFaite(false); setReservation({ nom:"", date:"", heure:"", personnes:"2" }); }}>
+                  Nouvelle réservation
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="form-field">
+                  <label className="form-label">👤 Nom complet</label>
+                  <input className="form-input" value={reservation.nom} onChange={e => setReservation({...reservation, nom: e.target.value})} placeholder="Ton nom..." />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">📅 Date</label>
+                  <input className="form-input" type="date" value={reservation.date} onChange={e => setReservation({...reservation, date: e.target.value})} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">🕐 Heure</label>
+                  <input className="form-input" type="time" value={reservation.heure} onChange={e => setReservation({...reservation, heure: e.target.value})} />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">👥 Nombre de personnes</label>
+                  <select className="form-input" value={reservation.personnes} onChange={e => setReservation({...reservation, personnes: e.target.value})}>
+                    {[1,2,3,4,5,6,7,8].map(n => <option key={n} value={n}>{n} personne{n > 1 ? "s" : ""}</option>)}
+                  </select>
+                </div>
+                <button className="btn-reserver" onClick={faireReservation}>
+                  📅 Confirmer la réservation
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+</script>
+</body>
+    </html>
