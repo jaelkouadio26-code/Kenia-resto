@@ -2,56 +2,65 @@
 <html>
 <head>
   <title>Kenia Resto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
     body { background: #ffffff; color: #333; font-family: Arial; padding: 20px; min-height: 100vh; }
-    h1 { color: #d4891e; font-size: 24px; margin-bottom: 5px; text-align: center; }
-    h2 { color: #e67e22; font-size: 17px; margin: 20px 0 10px; }
-    p { color: #555; font-size: 14px; }
+    h1 { color: #d4891e; font-size: clamp(1.4rem, 4vw, 2.2rem); margin-bottom: 5px; text-align: center; }
+    h2 { color: #e67e22; font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 20px 0 10px; }
+    p { color: #555; font-size: clamp(0.9rem, 2.2vw, 1.05rem); }
     .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
-    .tab { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: bold; transition: all 0.2s; }
+    .tab { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-size: clamp(0.8rem, 2vw, 1rem); font-weight: bold; transition: all 0.2s; }
     .tab.actif { background: #d4891e; color: white; }
     .tab.inactif { background: #f0e6d3; color: #666; }
     .plat-card { background: #f9f4ed; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #d4891e; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .plat-nom { font-size: 14px; font-weight: bold; color: #d4891e; }
-    .plat-desc { font-size: 12px; color: #666; margin-top: 3px; }
-    .plat-prix { font-size: 16px; font-weight: bold; color: #e67e22; margin-bottom: 8px; text-align: right; }
-    .btn-ajouter { padding: 6px 14px; border-radius: 8px; background: #d4891e; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .categorie-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-top: 4px; background: #d4891e22; color: #d4891e; border: 1px solid #d4891e44; }
+    .plat-nom { font-size: clamp(0.9rem, 2.2vw, 1.15rem); font-weight: bold; color: #d4891e; }
+    .plat-desc { font-size: clamp(0.75rem, 1.8vw, 0.95rem); color: #666; margin-top: 3px; }
+    .plat-prix { font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: bold; color: #e67e22; margin-bottom: 8px; text-align: right; }
+    .btn-ajouter { padding: 6px 14px; border-radius: 8px; background: #d4891e; border: none; color: white; font-weight: bold; cursor: pointer; font-size: clamp(0.8rem, 2vw, 1rem); }
+    .categorie-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: clamp(0.65rem, 1.5vw, 0.8rem); margin-top: 4px; background: #d4891e22; color: #d4891e; border: 1px solid #d4891e44; }
     .panier-item { background: #f9f4ed; border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .panier-nom { font-size: 13px; color: #333; }
-    .panier-prix { font-size: 13px; color: #e67e22; font-weight: bold; }
+    .panier-nom { font-size: clamp(0.85rem, 2vw, 1.05rem); color: #333; }
+    .panier-prix { font-size: clamp(0.85rem, 2vw, 1.05rem); color: #e67e22; font-weight: bold; }
     .qty-controls { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
-    .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #d4891e; color: white; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-    .qty-val { font-size: 14px; font-weight: bold; color: #d4891e; min-width: 20px; text-align: center; }
+    .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #d4891e; color: white; font-weight: bold; cursor: pointer; font-size: clamp(0.9rem, 2vw, 1.1rem); display: flex; align-items: center; justify-content: center; }
+    .qty-val { font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: bold; color: #d4891e; min-width: 20px; text-align: center; }
     .total-box { background: #f9f4ed; border-radius: 12px; padding: 15px; margin-top: 15px; border: 2px solid #d4891e; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .btn-commander { width: 100%; padding: 14px; background: linear-gradient(135deg, #d4891e, #e67e22); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    .btn-commander { width: 100%; padding: 14px; background: linear-gradient(135deg, #d4891e, #e67e22); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: clamp(1rem, 2.5vw, 1.2rem); cursor: pointer; margin-top: 10px; }
     .btn-commander.desactive { background: #ccc; cursor: not-allowed; opacity: 0.7; }
     .form-field { margin-bottom: 12px; }
-    .form-label { font-size: 12px; color: #555; margin-bottom: 5px; display: block; }
-    .form-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f9f4ed; color: #333; font-size: 14px; }
+    .form-label { font-size: clamp(0.75rem, 1.8vw, 0.95rem); color: #555; margin-bottom: 5px; display: block; }
+    .form-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f9f4ed; color: #333; font-size: clamp(0.9rem, 2vw, 1.05rem); }
     .form-input:focus { outline: none; border-color: #d4891e; }
-    .btn-reserver { width: 100%; padding: 12px; background: #d4891e; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
-    .notif { position: fixed; top: 20px; right: 20px; background: #f9f4ed; border-left: 4px solid #d4891e; border-radius: 10px; padding: 12px 16px; font-size: 13px; z-index: 999; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #333; }
+    .btn-reserver { width: 100%; padding: 12px; background: #d4891e; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: clamp(0.95rem, 2.2vw, 1.15rem); cursor: pointer; margin-top: 10px; }
+    .notif { position: fixed; top: 20px; right: 20px; background: #f9f4ed; border-left: 4px solid #d4891e; border-radius: 10px; padding: 12px 16px; font-size: clamp(0.8rem, 2vw, 1rem); z-index: 999; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #333; }
     @keyframes slideIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
     .panier-badge { background: #e74c3c; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px; }
     .empty-state { text-align: center; padding: 40px; color: #999; }
-    .empty-state .emoji { font-size: 48px; }
+    .empty-state .emoji { font-size: clamp(2.5rem, 6vw, 3.5rem); }
     .empty-state p { margin-top: 10px; color: #999; }
     .paiement-options { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
-    .paiement-option { flex: 1; min-width: 100px; padding: 12px; border-radius: 10px; border: 2px solid #ddd; background: white; cursor: pointer; text-align: center; font-weight: bold; font-size: 13px; transition: all 0.2s; }
+    .paiement-option { flex: 1; min-width: 100px; padding: 12px; border-radius: 10px; border: 2px solid #ddd; background: white; cursor: pointer; text-align: center; font-weight: bold; font-size: clamp(0.8rem, 2vw, 1rem); transition: all 0.2s; }
     .paiement-option:hover { border-color: #d4891e; }
     .paiement-option.selectionne { border-color: #d4891e; background: #d4891e10; }
-    .paiement-option .icon { font-size: 24px; display: block; margin-bottom: 5px; }
+    .paiement-option .icon { font-size: clamp(1.4rem, 3vw, 1.8rem); display: block; margin-bottom: 5px; }
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .modal { background: white; border-radius: 16px; padding: 30px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-    .modal h3 { color: #d4891e; margin-bottom: 15px; }
-    .modal .btn-fermer { margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none; background: #d4891e; color: white; font-weight: bold; cursor: pointer; width: 100%; }
-    .btn-payer { width: 100%; padding: 14px; background: linear-gradient(135deg, #27ae60, #2ecc71); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
-    .section-titre { font-size: 14px; font-weight: bold; color: #d4891e; margin: 15px 0 10px; padding-bottom: 5px; border-bottom: 2px solid #d4891e22; }
+    .modal h3 { color: #d4891e; margin-bottom: 15px; font-size: clamp(1.1rem, 2.5vw, 1.4rem); }
+    .modal .btn-fermer { margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none; background: #d4891e; color: white; font-weight: bold; cursor: pointer; width: 100%; font-size: clamp(0.85rem, 2vw, 1rem); }
+    .btn-payer { width: 100%; padding: 14px; background: linear-gradient(135deg, #27ae60, #2ecc71); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: clamp(1rem, 2.5vw, 1.2rem); cursor: pointer; margin-top: 10px; }
+    .section-titre { font-size: clamp(0.85rem, 2vw, 1.05rem); font-weight: bold; color: #d4891e; margin: 15px 0 10px; padding-bottom: 5px; border-bottom: 2px solid #d4891e22; }
+
+    @media (min-width: 768px) {
+      body { max-width: 700px; margin: 0 auto; padding: 40px 30px; }
+    }
+    @media (min-width: 1200px) {
+      body { max-width: 800px; }
+    }
   </style>
 </head>
 <body>
