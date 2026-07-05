@@ -337,4 +337,9 @@
   ReactDOM.createRoot(document.getElementById("app")).render(<App />);
 </script>
 </body>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+  </script>
     </html>
